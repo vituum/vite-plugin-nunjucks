@@ -8,9 +8,9 @@ import nunjucks from '@vituum/vite-plugin-nunjucks'
 
 export default {
   plugins: [
-    nunjucks({
-      filters: {}, 
-      extensions: {},
+    nunjucks({ 
+      filters: {someFilter: someFilter},
+      extensions: {someExtension: SomeExtension},
       data: '*.json',
       globals: {
           template: 'path/to/template.njk'
@@ -19,7 +19,7 @@ export default {
           html: /.(json.html|njk.json.html|njk.html)$/,
           json: /.(json.njk.html)$/
       },
-      options: {} // liquidjs options
+      options: {} // nunjucks options
     })
   ]
 }

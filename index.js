@@ -52,8 +52,7 @@ const renderTemplate = async(filename, content, options) => {
         lodash.merge(context, JSON.parse(fs.readFileSync(filename + '.json').toString()))
     }
 
-
-    const nunjucksEnvironment = nunjucks.configure(Object.assign({
+    const nunjucksEnvironment = nunjucks.configure(options.root, Object.assign({
         noCache: true
     }, options.options));
 
@@ -66,23 +65,35 @@ const renderTemplate = async(filename, content, options) => {
     })
 
     Object.keys(options.extensions).forEach(name => {
-        if (typeof options.extensions[name] !== 'object') {
-            throw new TypeError(`${name} needs to be an object!`)
+        if (typeof options.extensions[name] !== 'function') {
+            throw new TypeError(`${name} needs to be an function!`)
         }
 
-        nunjucksEnvironment.addExtension(name, options.extensions[name]);
+        nunjucksEnvironment.addExtension(name, new options.extensions[name]());
     })
 
     return new Promise((resolve) => {
-        nunjucksEnvironment.renderString(content, context, (error, content) => {
-            if (error) {
-                output.error = error
-                resolve(output)
-            } else {
-                output.content = content
-                resolve(output)
-            }
-        })
+        if (isTemplate) {
+            nunjucksEnvironment.render(context.template, context, (error, content) => {
+                if (error) {
+                    output.error = error
+                    resolve(output)
+                } else {
+                    output.content = content
+                    resolve(output)
+                }
+            })
+        } else {
+            nunjucksEnvironment.renderString(content, context, (error, content) => {
+                if (error) {
+                    output.error = error
+                    resolve(output)
+                } else {
+                    output.content = content
+                    resolve(output)
+                }
+            })
+        }
     })
 }
 
