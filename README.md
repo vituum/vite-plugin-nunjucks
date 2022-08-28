@@ -8,9 +8,11 @@ import nunjucks from '@vituum/vite-plugin-nunjucks'
 
 export default {
   plugins: [
-    nunjucks({ 
-      filters: {someFilter: someFilter},
-      extensions: {someExtension: SomeExtension},
+    nunjucks({
+      reload: true, 
+      root: null,
+      filters: {},
+      extensions: {},
       data: '*.json',
       globals: {
           template: 'path/to/template.njk'
@@ -19,11 +21,15 @@ export default {
           html: /.(json.html|njk.json.html|njk.html)$/,
           json: /.(json.njk.html)$/
       },
-      options: {} // nunjucks options
+      nunjucks: {} // nunjucks options
     })
   ]
 }
 ```
+
+Read the [docs](https://vituum.dev/config/integrations-options.html#vituum-nunjucks) to learn more about the plugin options.
+
+## Basic usage
 
 ```html
 <!-- index.html -->
@@ -51,3 +57,4 @@ or
 ### Requirements
 
 - [Node.js LTS (16.x)](https://nodejs.org/en/download/)
+- [Vite](https://vitejs.dev/) or [Vituum](https://vituum.dev/)
