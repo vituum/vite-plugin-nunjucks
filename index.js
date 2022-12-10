@@ -59,7 +59,7 @@ const renderTemplate = async(filename, content, options) => {
 
     const nunjucksEnvironment = nunjucks.configure(options.root, Object.assign({
         noCache: true
-    }, options.nunjucks));
+    }, options.nunjucks))
 
     Object.keys(options.filters).forEach(name => {
         if (typeof options.filters[name] !== 'function') {
@@ -74,7 +74,7 @@ const renderTemplate = async(filename, content, options) => {
             throw new TypeError(`${name} needs to be an function!`)
         }
 
-        nunjucksEnvironment.addExtension(name, new options.extensions[name]());
+        nunjucksEnvironment.addExtension(name, new options.extensions[name]())
     })
 
     return new Promise((resolve) => {
@@ -136,13 +136,13 @@ const plugin = (options = {}) => {
                         return
                     }
 
-                    server.ws.send({
+                    setTimeout(() => server.ws.send({
                         type: 'error',
                         err: {
                             message: render.error.message,
                             plugin: name
                         }
-                    })
+                    }), 50)
                 }
 
                 return render.content
