@@ -7,13 +7,20 @@
 import nunjucks from '@vituum/vite-plugin-nunjucks'
 
 export default {
-  plugins: [
-    nunjucks()
-  ]
+    plugins: [
+        nunjucks()
+    ],
+    build: {
+        rollupOptions: {
+            input: ['index.njk.html']
+        }
+    }
+
 }
 ```
 
-Read the [docs](https://vituum.dev/plugins/nunjucks) to learn more about the plugin options.
+* Read the [docs](https://vituum.dev/plugins/nunjucks) to learn more about the plugin options.
+* Use with [Vituum](https://vituum.dev) to get full functionality.
 
 ## Basic usage
 
@@ -24,7 +31,7 @@ or
 ```
 or
 ```html
-<!-- index.json or index.njk.json  -->
+<!-- index.json  -->
 {
   "template": "path/to/template.njk",
   "title": "Hello world"
