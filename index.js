@@ -1,11 +1,17 @@
 import { resolve, relative } from 'path'
 import fs from 'fs'
-import process from 'node:process'
 import lodash from 'lodash'
 import nunjucks from 'nunjucks'
-import { getPackageInfo, merge, pluginBundle, pluginError, pluginReload, processData } from 'vituum/utils/common.js'
+import {
+    getPackageInfo,
+    merge, normalizePath,
+    pluginBundle,
+    pluginMiddleware,
+    pluginReload,
+    pluginTransform,
+    processData
+} from 'vituum/utils/common.js'
 import { renameBuildEnd, renameBuildStart } from 'vituum/utils/build.js'
-import { minimatch } from 'minimatch'
 
 const { name } = getPackageInfo(import.meta.url)
 
@@ -26,13 +32,13 @@ const defaultOptions = {
     options: {}
 }
 
-const renderTemplate = async ({ filename, server, root }, content, options) => {
+const renderTemplate = async ({ filename, server, resolvedConfig }, content, options) => {
     const initialFilename = filename.replace('.html', '')
     const output = {}
     const context = options.data
         ? processData({
             paths: options.data,
-            root
+            root: resolvedConfig.root
         }, options.globals)
         : options.globals
 
@@ -57,7 +63,8 @@ const renderTemplate = async ({ filename, server, root }, content, options) => {
             })
         }
 
-        context.template = relative(process.cwd(), context.template).startsWith(relative(process.cwd(), options.root)) ? resolve(process.cwd(), context.template) : resolve(options.root, context.template)
+        context.template = normalizePath(context.template)
+        context.template = relative(resolvedConfig.root, context.template).startsWith(relative(resolvedConfig.root, options.root)) ? resolve(resolvedConfig.root, context.template) : resolve(options.root, context.template)
     } else if (fs.existsSync(`${initialFilename}.json`)) {
         lodash.merge(context, JSON.parse(fs.readFileSync(`${initialFilename}.json`).toString()))
     }
@@ -121,17 +128,19 @@ const plugin = (options = {}) => {
 
             if (!options.root) {
                 options.root = config.root
+            } else {
+                options.root = normalizePath(options.root)
             }
         },
         buildStart: async () => {
-            if (userEnv.command !== 'build') {
+            if (userEnv.command !== 'build' || !resolvedConfig.build.rollupOptions.input) {
                 return
             }
 
             await renameBuildStart(resolvedConfig.build.rollupOptions.input, options.formats)
         },
         buildEnd: async () => {
-            if (userEnv.command !== 'build') {
+            if (userEnv.command !== 'build' || !resolvedConfig.build.rollupOptions.input) {
                 return
             }
 
@@ -140,38 +149,11 @@ const plugin = (options = {}) => {
         transformIndexHtml: {
             order: 'pre',
             async transform (content, { path, filename, server }) {
-                if (
-                    !options.formats.find(format => filename.replace('.html', '').endsWith(format)) ||
-                    (filename.replace('.html', '').endsWith('.json') && !content.startsWith('{'))
-                ) {
-                    return content
-                }
-
-                if (
-                    (filename.replace('.html', '').endsWith('.json') && content.startsWith('{')) &&
-                    (JSON.parse(content)?.format && !options.formats.includes(JSON.parse(content)?.format))
-                ) {
-                    return content
-                }
-
-                if (options.ignoredPaths.find(ignoredPath => minimatch(path.replace('.html', ''), ignoredPath) === true)) {
-                    return content
-                }
-
-                const render = await renderTemplate({ filename, server, root: resolvedConfig.root }, content, options)
-                const renderError = pluginError(render.error, server, name)
-
-                if (renderError && server) {
-                    return
-                } else if (renderError) {
-                    return renderError
-                }
-
-                return render.content
+                return pluginTransform(content, { path, filename, server }, { name, options, resolvedConfig, renderTemplate })
             }
         },
         handleHotUpdate: ({ file, server }) => pluginReload({ file, server }, options)
-    }, pluginBundle(options.formats)]
+    }, pluginBundle(options.formats), pluginMiddleware(name, options.formats)]
 }
 
 export default plugin

@@ -19,8 +19,8 @@ export default {
 }
 ```
 
-* Read the [docs](https://vituum.dev/plugins/nunjucks) to learn more about the plugin options.
-* Use with [Vituum](https://vituum.dev) to get full functionality.
+* Read the [docs](https://vituum.dev/plugins/nunjucks.html) to learn more about the plugin options.
+* Use with [Vituum](https://vituum.dev) to get multi-page support.
 
 ## Basic usage
 
