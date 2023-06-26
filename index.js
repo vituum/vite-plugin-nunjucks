@@ -63,8 +63,9 @@ const renderTemplate = async ({ filename, server, resolvedConfig }, content, opt
             })
         }
 
-        context.template = normalizePath(context.template)
-        context.template = relative(resolvedConfig.root, context.template).startsWith(relative(resolvedConfig.root, options.root)) ? resolve(resolvedConfig.root, context.template) : resolve(options.root, context.template)
+        context.template = normalizePath(relative(resolvedConfig.root, context.template)).startsWith(normalizePath(relative(resolvedConfig.root, options.root)))
+            ? normalizePath(resolve(resolvedConfig.root, context.template))
+            : normalizePath(resolve(options.root, context.template))
     } else if (fs.existsSync(`${initialFilename}.json`)) {
         lodash.merge(context, JSON.parse(fs.readFileSync(`${initialFilename}.json`).toString()))
     }
