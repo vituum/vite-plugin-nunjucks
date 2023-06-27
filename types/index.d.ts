@@ -36,3 +36,5 @@ export interface PluginUserConfig {
     ignoredPaths?: string[]
     options?: NunjucksOptions
 }
+
+export default function plugin(options?: PluginUserConfig) : import('vite').Plugin
