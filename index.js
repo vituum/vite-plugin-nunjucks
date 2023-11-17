@@ -4,7 +4,7 @@ import lodash from 'lodash'
 import nunjucks from 'nunjucks'
 import {
     getPackageInfo,
-    merge, normalizePath,
+    merge,
     pluginBundle,
     pluginMiddleware,
     pluginReload,
@@ -145,7 +145,7 @@ const plugin = (options = {}) => {
         },
         transformIndexHtml: {
             order: 'pre',
-            async transform (content, { path, filename, server }) {
+            async handler (content, { path, filename, server }) {
                 return pluginTransform(content, { path, filename, server }, { name, options, resolvedConfig, renderTemplate })
             }
         },
