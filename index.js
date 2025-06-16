@@ -32,6 +32,8 @@ const defaultOptions = {
     options: {}
 }
 
+const resolveRollupInput = input => Array.isArray(input) ? input : Object.values(input)
+
 const renderTemplate = async ({ filename, server, resolvedConfig }, content, options) => {
     const initialFilename = filename.replace('.html', '')
     const output = {}
@@ -134,14 +136,14 @@ const plugin = (options = {}) => {
                 return
             }
 
-            await renameBuildStart(resolvedConfig.build.rollupOptions.input, options.formats)
+            await renameBuildStart(resolveRollupInput(resolvedConfig.build.rollupOptions.input), options.formats)
         },
         buildEnd: async () => {
             if (userEnv.command !== 'build' || !resolvedConfig.build.rollupOptions.input) {
                 return
             }
 
-            await renameBuildEnd(resolvedConfig.build.rollupOptions.input, options.formats)
+            await renameBuildEnd(resolveRollupInput(resolvedConfig.build.rollupOptions.input), options.formats)
         },
         transformIndexHtml: {
             order: 'pre',
