@@ -1,9 +1,16 @@
 {
   "name": "@vituum/vite-plugin-nunjucks",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "main": "index.js",
   "types": "types/index.d.ts",
+  "description": "Vite plugin for Nunjucks, transforms njk templates into HTML",
+  "keywords": [
+    "nunjucks",
+    "vituum",
+    "vite",
+    "vite-plugin"
+  ],
   "scripts": {
     "lint": "npm run eslint && npm run tsc",
     "tsc": "tsc",
@@ -14,14 +21,16 @@
     "vituum": "^2.0",
     "nunjucks": "^3.2"
   },
+  "peerDependencies": {
+    "vite": "^8.0"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0",
     "@stylistic/eslint-plugin": "^5.10",
     "@types/node": "^25.5",
     "eslint": "^10.0",
     "globals": "^17.4",
-    "typescript": "^5.9",
-    "vite": "^8.0"
+    "typescript": "^5.9"
   },
   "files": [
     "index.js",
